@@ -21,5 +21,5 @@ namespace inaApp.Common.Interfaces
 
         Task<bool> EliminarAsync(int id);
 
-    }
-}
+    }//end interface
+}//end namespace

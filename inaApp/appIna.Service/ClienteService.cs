@@ -6,22 +6,25 @@ using System.Text;
 
 namespace inaApp.Service
 {
-    public class ProductoService : IProductoService
+    public class ClienteService : IClienteService
     {
-        private readonly IProductoRepository _productoRepository;
+        //inyeccion de dependencias o instancia y utilizar el constructor
+        public readonly IClienteRepository _clienteRepository;
 
-        public ProductoService(IProductoRepository productoRepository)
+
+        //ahora paso la inyeccion dependencia por el constructor
+        public ClienteService(IClienteRepository clienteRepository)
         {
-            _productoRepository = productoRepository;
+            _clienteRepository = clienteRepository;
+        }
 
-        }//end method constructor
 
-        public Task<Producto> ActualizarAsync(Producto producto)
+        public Task<Cliente> ActualizarAsync(Cliente cliente)
         {
             throw new NotImplementedException();
         }//end method update
 
-        public Task<Producto> CrearAsync(Producto producto)
+        public Task<Cliente> CrearAsync(Cliente cliente)
         {
             throw new NotImplementedException();
         }//end method create
@@ -31,16 +34,15 @@ namespace inaApp.Service
             throw new NotImplementedException();
         }//end method delete
 
-        public Task<Producto> ObtenerPorIdAsync(int id)
+        public Task<Cliente> ObtenerPorIdAsync(int id)
         {
             throw new NotImplementedException();
         }//end method getById
 
-        public Task<List<Producto>> ObtenerTodosAsync()
+        public Task<List<Cliente>> ObtenerTodosAsync()
         {
-            _productoRepository.ObtenerTodosAsync();
+            _clienteRepository.ObtenerTodosAsync();
             return null;
-
         }//end method getAll
 
     }//end class
