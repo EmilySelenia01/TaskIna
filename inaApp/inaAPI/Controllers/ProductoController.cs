@@ -1,6 +1,9 @@
 ﻿using inaApp.Common.Interfaces;
+using inaApp.Entities;
+using inaApp.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
 
 namespace inaAPI.Controllers
 {
@@ -9,96 +12,82 @@ namespace inaAPI.Controllers
     [Route("api/producto")]
     public class ProductoController : Controller
     {
-        //INYECCION DE DEPENDENCIAS O INSTANCIA Y UTILIZAR EL CONSTRUCTOR 
+        //injects of dependency O INSTANCIA Y UTILIZAR EL CONSTRUCTOR 
         //PARA PASARLE LA INYECCION Y SETEARLE 
+        private readonly IGenericService<Producto> _productoService;
 
-        private readonly IProductoService _productoService;
-
-        //ahora paso la inyeccion dependencia por el constructor 
-        //inicializa los datos, 
-        public ProductoController(IProductoService productoService)
-        {
-            //inyecta el servio en el controlador 
+        //ahora paso la inyeccion dependencia por el constructor inicializa los datos, 
+        public ProductoController(IGenericService<Producto> productoService) {
+            
+            //injects the service into the controller
             _productoService = productoService;
-        }
-        
-        // GET: ProductoController
+
+        }//end method constructor
+
+
         //status code es lo que se devuelve con ACTIONRESULT 
-        [HttpGet]
-        public ActionResult Index()
-        {
-            _productoService.ObtenerTodosAsync();
+        [HttpGet("getAll")]
+        public async Task<ActionResult>Index() {
+            var lista = await _productoService.ObtenerTodosAsync();
+            
+            if (lista.Count == 0)
+                return NotFound("No hay datos");
+            
+            return Ok(lista);
 
-            return Ok("Correcto");
-        }
+        }//end method getAll
 
-        // GET: ProductoController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
 
-        // GET: ProductoController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
+        //subroute for getById
+        [HttpGet("{id}")]
+        public async Task<ActionResult> Details(int id) {
+            if (id <= 0)
+                return BadRequest("Id incorrecto");
 
-        // POST: ProductoController/Create
+            var product = await _productoService.ObtenerPorIdAsync(id);
+            return Ok(product);
+
+        }//end method getById
+
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        public async Task<ActionResult> Create([FromBody] Producto producto) {
+            
+            try {
+                var result = await _productoService.CrearAsync(producto);
+                return Ok(result);
 
-        // GET: ProductoController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+            } catch (Exception ex) {
+                return BadRequest($"Error al crear el producto: {ex.Message}");
+            }
 
-        // POST: ProductoController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        }//end method create
 
-        // GET: ProductoController/Delete/5
-        public ActionResult Delete(int id)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Edit(int id, [FromBody] Producto producto)
         {
-            return View();
-        }
+            producto.Id = id; // assure that the ID from the route is used
 
-        // POST: ProductoController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-    }
-}
+            if (id <= 0)
+                return BadRequest("Id incorrecto");
+
+            var result = await _productoService.ActualizarAsync(producto);
+            return Ok(result);
+
+        }//end method edit
+
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id) {
+            
+            if (id <= 0)
+                return BadRequest("Error al eliminar, id incorrecto");
+            
+            var result = await _productoService.EliminarAsync(id);
+            
+            return result? Ok("Producto eliminado correctamente") : NotFound("Producto no encontrado");
+
+        }//end method delete
+
+    }//end class
+}//end namespace

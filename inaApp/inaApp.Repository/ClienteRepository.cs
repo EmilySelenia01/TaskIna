@@ -6,32 +6,32 @@ using System.Text;
 
 namespace inaApp.Repository
 {
-    public class ClienteRepository : IClienteRepository
+    public class ClienteRepository : IGenericRepository<Cliente>
     {
-        public Task<Cliente> ActualizarAsync(Cliente cliente)
+        public Task<Cliente> ActualizarAsync(Cliente entity)
         {
             throw new NotImplementedException();
-        }//end method update
+        }
 
-        public Task<Cliente> CrearAsync(Cliente cliente)
+        public Task<Cliente> CrearAsync(Cliente entity)
         {
             throw new NotImplementedException();
-        }//end method create
+        }
 
         public Task<bool> EliminarAsync(int id)
         {
             throw new NotImplementedException();
-        }//end method   delete
+        }
 
         public Task<Cliente> ObtenerPorIdAsync(int id)
         {
             throw new NotImplementedException();
-        }//end method getById
+        }
 
         public Task<List<Cliente>> ObtenerTodosAsync()
         {
             throw new NotImplementedException();
-        }//end method getAll
-
+        }
+    
     }//end class
 }//end namespace

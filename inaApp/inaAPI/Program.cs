@@ -1,16 +1,13 @@
+using inaAPI.Extensions;
 using inaApp.Common.Interfaces;
 using inaApp.Repository;
 using inaApp.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//aqui estoy haciendo la inyeccion dependencia y en el controlador se consume
-//Constructor crea la inyeccion 
-builder.Services.AddScoped<IProductoService, ProductoService>();
-//builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
-builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
-builder.Services.AddScoped<IClienteService, ClienteService>();
-builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+//registro contenedor de inyecciones de dependencias 
+//Clase DependencyInyection se encarga de registrar los servicios y repositorios
+builder.Services.addAplicationService(builder.Configuration);
 
 builder.Services.AddControllers();
 

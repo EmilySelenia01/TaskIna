@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace inaApp.Entities
@@ -9,6 +11,8 @@ namespace inaApp.Entities
     //Private solo las clases dentro del mismo archivo pueden acceder a esta clase
     //Internal solo se puede acceder dentro de su misma capa, son publicos 
     //Protegido solo las clases dentro del mismo proyecto y la clases que heredan 
+
+    //[Table(name:"tbProducto")] //Data Annotations
     public class Producto
     {
         /*Antes se trabajaba de esta manera
@@ -26,6 +30,8 @@ namespace inaApp.Entities
 
         */
 
+        [Key] //Data Annotations
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Nombre { get; set; }
         public decimal Precio { get; set; }

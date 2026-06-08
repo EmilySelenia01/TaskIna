@@ -6,20 +6,19 @@ using System.Text;
 
 namespace inaApp.Service
 {
-    public class ClienteService : IClienteService
+    public class ClienteService : IGenericService<Cliente>
     {
         //inyeccion de dependencias o instancia y utilizar el constructor
-        public readonly IClienteRepository _clienteRepository;
+        public readonly IGenericRepository<Cliente>  _clienteRepository;
 
 
         //ahora paso la inyeccion dependencia por el constructor
-        public ClienteService(IClienteRepository clienteRepository)
+        public ClienteService(IGenericRepository<Cliente> clienteRepository)
         {
             _clienteRepository = clienteRepository;
         }
 
-
-        public Task<Cliente> ActualizarAsync(Cliente cliente)
+        public Task<Cliente> ActualizarAsync( Cliente cliente)
         {
             throw new NotImplementedException();
         }//end method update
