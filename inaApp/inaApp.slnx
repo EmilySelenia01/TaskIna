@@ -3,6 +3,7 @@
   <Project Path="Data/inaApp.Data.csproj" Id="06471216-f70d-48c0-bcb4-cd8e72331881" />
   <Project Path="inaAPI/inaAPI.csproj" />
   <Project Path="inaApp.Common/inaApp.Common.csproj" />
+  <Project Path="inaApp.DTOs/inaApp.DTOs.csproj" Id="365239f5-f271-4842-9c1c-63c6914f4454" />
   <Project Path="inaApp.Entities/inaApp.Entities.csproj" />
   <Project Path="inaApp.Repository/inaApp.Repository.csproj" />
 </Solution>

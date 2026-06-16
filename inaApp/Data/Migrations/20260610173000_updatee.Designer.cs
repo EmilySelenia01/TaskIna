@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using inaApp.Data;
 
@@ -11,9 +12,11 @@ using inaApp.Data;
 namespace inaApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260610173000_updatee")]
+    partial class updatee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,24 +24,6 @@ namespace inaApp.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("inaApp.Entities.Categoria", b =>
-                {
-                    b.Property<int>("IdCategoria")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCategoria"));
-
-                    b.Property<string>("NombreCategoria")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("IdCategoria");
-
-                    b.ToTable("Categorias");
-                });
 
             modelBuilder.Entity("inaApp.Entities.Cliente", b =>
                 {
@@ -74,7 +59,6 @@ namespace inaApp.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SegundoApellido")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -87,9 +71,8 @@ namespace inaApp.Data.Migrations
 
                     b.HasKey("IdCliente");
 
-                    b.HasIndex("TipoIdentificacion", "NumeroIdentificacion", "CorreoElectronico")
-                        .IsUnique()
-                        .HasFilter("[CorreoElectronico] IS NOT NULL");
+                    b.HasIndex("TipoIdentificacion", "NumeroIdentificacion")
+                        .IsUnique();
 
                     b.ToTable("Clientes");
                 });
@@ -104,19 +87,14 @@ namespace inaApp.Data.Migrations
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Estado")
                         .HasColumnType("bit");
 
-                    b.Property<int>("IdCategoria")
-                        .HasColumnType("int");
-
                     b.Property<string>("Nombre")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Precio")
                         .HasColumnType("decimal(18,2)");
@@ -126,25 +104,7 @@ namespace inaApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdCategoria");
-
                     b.ToTable("Productos");
-                });
-
-            modelBuilder.Entity("inaApp.Entities.Producto", b =>
-                {
-                    b.HasOne("inaApp.Entities.Categoria", "Categoria")
-                        .WithMany("Productos")
-                        .HasForeignKey("IdCategoria")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Categoria");
-                });
-
-            modelBuilder.Entity("inaApp.Entities.Categoria", b =>
-                {
-                    b.Navigation("Productos");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,6 +1,4 @@
 ﻿using inaApp.Common.Enums;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,53 +6,33 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using static inaApp.Common.Enums.Enumeradores;
 
-namespace inaApp.Entities
+namespace inaApp.DTOs.Cliente
 {
-    // This class represents the entity of the client  
-    [Index(nameof(TipoIdentificacion), nameof(NumeroIdentificacion), nameof(CorreoElectronico), IsUnique = true)]
-    public class Cliente {
+    public class ClienteCreateDTO {
 
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IdCliente { get; set; }
-
-
+        
         [Required(ErrorMessage = "El tipo de identificación es obligatorio.")]
         public TipoIdentificacion TipoIdentificacion { get; set; }
 
-        
         [Required(ErrorMessage = "El número de identificación es obligatorio.")]
-        [MaxLength(20, ErrorMessage = "El número de identificación no puede superar los 20 caracteres.")]
         public string NumeroIdentificacion { get; set; } = string.Empty;
 
-
         [Required(ErrorMessage = "El nombre del cliente es obligatorio.")]
-        [MaxLength(100, ErrorMessage = "El nombre no puede superar los 100 caracteres.")]
         public string Nombre { get; set; } = string.Empty;
 
-
         [Required(ErrorMessage = "El primer apellido del cliente es obligatorio.")]
-        [MaxLength(50, ErrorMessage = "El primer apellido no puede superar los 50 caracteres.")]
         public string PrimerApellido { get; set; } = string.Empty;
 
-        
         [Required(ErrorMessage = "El segundo apellido del cliente es obligatorio.")]
-        [MaxLength(50, ErrorMessage = "El segundo apellido no puede superar los 50 caracteres.")]
         public string? SegundoApellido { get; set; }
 
-        
         [EmailAddress]
-        [MaxLength(150)]
+        [Required(ErrorMessage = "El correo del cliente es obligatorio.")]
         public string? CorreoElectronico { get; set; }
 
-        
         [Phone]
-        [MaxLength(20)]
+        [Required(ErrorMessage = "El telefono del cliente es obligatorio.")]
         public string? Telefono { get; set; }
-
-        public bool Estado { get; set; } = true;
-
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
 
     }//end CLASS
 

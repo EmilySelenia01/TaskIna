@@ -1,4 +1,6 @@
-﻿using inaApp.Common.Interfaces;
+﻿using inaApp.Common.Exception;
+using inaApp.Common.Interfaces;
+using inaApp.DTOs.Producto;
 using inaApp.Entities;
 using inaApp.Service;
 using Microsoft.AspNetCore.Http;
@@ -9,85 +11,127 @@ namespace inaAPI.Controllers
 {
     //RUTA DE MI CONTROLLER API 
     [ApiController]
-    [Route("api/producto")]
+    [Route("api/[controller]")]
     public class ProductoController : Controller
     {
         //injects of dependency O INSTANCIA Y UTILIZAR EL CONSTRUCTOR 
         //PARA PASARLE LA INYECCION Y SETEARLE 
-        private readonly IGenericService<Producto> _productoService;
+        private readonly IGenericService<ProductoResponseDTO, ProductoCreateDTO, ProductoUpdateDTO> _productoService;
 
         //ahora paso la inyeccion dependencia por el constructor inicializa los datos, 
-        public ProductoController(IGenericService<Producto> productoService) {
-            
-            //injects the service into the controller
-            _productoService = productoService;
+        public ProductoController(IGenericService<ProductoResponseDTO, ProductoCreateDTO, ProductoUpdateDTO> productoService) {
+          
+            _productoService = productoService;//injects the service into the controller
 
         }//end method constructor
-
-
-        //status code es lo que se devuelve con ACTIONRESULT 
-        [HttpGet("getAll")]
-        public async Task<ActionResult>Index() {
-            var lista = await _productoService.ObtenerTodosAsync();
-            
-            if (lista.Count == 0)
-                return NotFound("No hay datos");
-            
-            return Ok(lista);
-
-        }//end method getAll
 
 
         //subroute for getById
         [HttpGet("{id}")]
         public async Task<ActionResult> Details(int id) {
-            if (id <= 0)
-                return BadRequest("Id incorrecto");
 
-            var product = await _productoService.ObtenerPorIdAsync(id);
-            return Ok(product);
+            try {
+                var product = await _productoService.ObtenerPorIdAsync(id);
+                return Ok(product);
 
-        }//end method getById
+            } catch (NotFoundExceptionD ex) {
+                return NotFound(ex.Message);
+
+            } catch (Exception ex) {
+                return BadRequest($"Error al crear el producto: {ex.Message}");
+
+            }
+
+        }//end METHOD getById
+
+
+        //status code es lo que se devuelve con ACTIONRESULT 
+        [HttpGet("getAll")]
+        public async Task<ActionResult>Index() {
+
+            try {
+                var lista = await _productoService.ObtenerTodosAsync();
+                return Ok(lista);
+
+            } catch (NotFoundExceptionD ex) {
+                return NotFound(ex.Message);
+
+            } catch (Exception ex) {
+                return BadRequest($"Error al obtener los productos: {ex.Message}");
+            }
+
+        }//end METHOD getAll
 
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] Producto producto) {
-            
+        public async Task<ActionResult> Create([FromBody] ProductoCreateDTO productoDTO) {
+
             try {
-                var result = await _productoService.CrearAsync(producto);
-                return Ok(result);
+                if(!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var response = await _productoService.CrearAsync(productoDTO);
+                return Created("Producto creado ", response);
+
+            } catch (DuplicateProductNameException ex) {
+                return BadRequest(ex.Message);
+
+            } catch (InvalidPriceException ex) {
+                return BadRequest(ex.Message);
+
+            } catch (InvalidStockException ex) {
+                return BadRequest(ex.Message);
 
             } catch (Exception ex) {
                 return BadRequest($"Error al crear el producto: {ex.Message}");
             }
 
-        }//end method create
+        }//end METHOD create
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Edit(int id, [FromBody] Producto producto)
-        {
-            producto.Id = id; // assure that the ID from the route is used
 
-            if (id <= 0)
-                return BadRequest("Id incorrecto");
+        [HttpPut]
+        public async Task<ActionResult> Edit([FromBody] ProductoUpdateDTO productoDTO) {
+            
+            try {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            var result = await _productoService.ActualizarAsync(producto);
-            return Ok(result);
+                var response = await _productoService.ActualizarAsync(productoDTO);
+                return Ok(response);
 
-        }//end method edit
+            } catch (DuplicateProductNameException ex) {
+                return Conflict(ex.Message);
+
+            } catch (InvalidPriceException ex) {
+                return BadRequest(ex.Message);
+
+            } catch (InvalidStockException ex) {
+                return BadRequest(ex.Message);
+
+            } catch (Exception ex) {
+                return BadRequest($"Error al crear el producto: {ex.Message}");
+            }
+
+        }//end METHOD edit
 
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id) {
             
-            if (id <= 0)
-                return BadRequest("Error al eliminar, id incorrecto");
-            
-            var result = await _productoService.EliminarAsync(id);
-            
-            return result? Ok("Producto eliminado correctamente") : NotFound("Producto no encontrado");
+            try {
+                if (id <= 0)
+                    return BadRequest("Error al eliminar, id incorrecto");
 
-        }//end method delete
+                var response = await _productoService.EliminarAsync(id);
+                return response.Data ? Ok(response) : BadRequest(response);
 
-    }//end class
-}//end namespace
+            } catch (Exception ex) {
+                return StatusCode(500, $"Error al eliminar el producto: {ex.Message}");
+            }
+
+        }//end METHOD delete
+
+
+    }//end CLASS
+
+}//end NAMESPACE

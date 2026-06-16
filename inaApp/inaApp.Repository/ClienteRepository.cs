@@ -1,37 +1,106 @@
 ﻿using inaApp.Common.Interfaces;
+using inaApp.Data;
 using inaApp.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace inaApp.Repository
 {
-    public class ClienteRepository : IGenericRepository<Cliente>
-    {
-        public Task<Cliente> ActualizarAsync(Cliente entity)
-        {
-            throw new NotImplementedException();
-        }
+    //This class has the responsiblity to implement
+    //the interface generic and connect with the database
+    public class ClienteRepository : IGenericRepository<Cliente> {
 
-        public Task<Cliente> CrearAsync(Cliente entity)
-        {
-            throw new NotImplementedException();
-        }
+        public readonly ApplicationDbContext _context;//we need to inject the context 
 
-        public Task<bool> EliminarAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task<Cliente> ObtenerPorIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        //we can now access to the database and context in this repository
+        public ClienteRepository(ApplicationDbContext context) {
+            _context = context;
 
-        public Task<List<Cliente>> ObtenerTodosAsync()
-        {
-            throw new NotImplementedException();
-        }
-    
-    }//end class
-}//end namespace
+        }//end METHOD
+
+
+        //SingleOrDefaultAsync: search in the database for a specific result
+        //just one result if exist or if not exist return null 
+        public async Task<Cliente> ObtenerPorIdAsync(int id) {
+            
+            try {
+                return await _context.Clientes.AsNoTracking().Where(c => c.IdCliente == id && c.Estado == true).SingleOrDefaultAsync();
+
+            } catch (Exception ex) {
+                throw new Exception("Error al obtener el cliente por ID: ", ex);
+            }
+
+        }//end METHOD
+
+
+        //AsNoTracking means that we just want to read the data in the database   
+        public async Task<List<Cliente>> ObtenerTodosAsync() {
+
+            try {
+                return await _context.Clientes.AsNoTracking().Where(c => c.Estado == true).ToListAsync();
+
+            } catch (Exception ex) {
+                throw new Exception($"Error al consultar clientes en la base de datos: {ex.Message}", ex);
+            }
+
+        }//end METHOD
+
+
+        //We use await because it's an asyc method and we need it.
+        //to comunicate with the database and save information received as parameters 
+        public async Task<Cliente> CrearAsync(Cliente entity) {
+            
+            try {
+                await _context.Clientes.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                return entity;
+
+            } catch (Exception ex) {
+                throw new Exception("Error al crear el cliente: ", ex);
+            }
+
+        }//end METHOD
+
+
+        //recieve the entity as parameter
+        //update the entity in the database  
+        public async Task<Cliente> ActualizarAsync(Cliente entity) {
+            
+            try {
+                _context.Clientes.Update(entity);
+                await _context.SaveChangesAsync();
+                return entity;
+
+            } catch (Exception ex) {
+                throw new Exception("Error al actualizar el cliente: ", ex);
+            }
+
+        }//end METHOD
+
+
+        //first: search client by id after delete logic by change the state 
+        //third: update the client with the new state
+        public async Task<bool> EliminarAsync(int id) {
+            try {
+                var cliente = await _context.Clientes
+                    .FirstOrDefaultAsync(c => c.IdCliente == id && c.Estado == true);
+
+                if (cliente == null)
+                    return false;
+
+                cliente.Estado = false;
+                await _context.SaveChangesAsync();
+                return true;
+
+            } catch (Exception ex) {
+                throw new Exception("Error al eliminar el cliente.", ex);
+            }
+
+        }//end METHOD
+
+    }//end CLASS
+
+}//end NAMESPACE
