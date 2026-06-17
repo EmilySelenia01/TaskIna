@@ -84,6 +84,7 @@ namespace inaApp.Repository
         //first: search client by id after delete logic by change the state 
         //third: update the client with the new state
         public async Task<bool> EliminarAsync(int id) {
+            
             try {
                 var cliente = await _context.Clientes
                     .FirstOrDefaultAsync(c => c.IdCliente == id && c.Estado == true);

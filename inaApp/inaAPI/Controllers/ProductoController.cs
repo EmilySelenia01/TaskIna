@@ -73,8 +73,8 @@ namespace inaAPI.Controllers
                 var response = await _productoService.CrearAsync(productoDTO);
                 return Created("Producto creado ", response);
 
-            } catch (DuplicateProductNameException ex) {
-                return BadRequest(ex.Message);
+            } catch (DuplicateNameException ex) {
+                return Conflict(ex.Message);
 
             } catch (InvalidPriceException ex) {
                 return BadRequest(ex.Message);
@@ -99,7 +99,7 @@ namespace inaAPI.Controllers
                 var response = await _productoService.ActualizarAsync(productoDTO);
                 return Ok(response);
 
-            } catch (DuplicateProductNameException ex) {
+            } catch (DuplicateNameException ex) {
                 return Conflict(ex.Message);
 
             } catch (InvalidPriceException ex) {
@@ -124,6 +124,9 @@ namespace inaAPI.Controllers
 
                 var response = await _productoService.EliminarAsync(id);
                 return response.Data ? Ok(response) : BadRequest(response);
+
+            } catch (NotFoundExceptionD ex) {
+                return NotFound(ex.Message);
 
             } catch (Exception ex) {
                 return StatusCode(500, $"Error al eliminar el producto: {ex.Message}");

@@ -20,7 +20,20 @@ namespace inaAPI.Controllers
         [HttpGet("{id}")]
         // GET: CategoriaController/Details/5
         public async Task<ActionResult> Details(int id) {
-            return View();
+
+            try {
+                var category = await _categoriaService.ObtenerPorIdAsync(id);
+                return Ok(category);
+
+            } catch (NotFoundExceptionD ex) {
+                return NotFound(ex.Message);
+
+            } catch (InvalidIdException ex) {
+                return BadRequest(ex.Message);
+
+            } catch (Exception ex) {
+                return BadRequest(new { mensaje = $"Error al obtener la categoria: {ex.Message}" });
+            }
 
         }//end METHOD
 
@@ -51,6 +64,9 @@ namespace inaAPI.Controllers
             } catch (NotFoundExceptionD ex) {
                 return NotFound(ex.Message);
 
+            } catch (DuplicateNameException ex) {
+                return BadRequest(ex.Message);
+
             } catch (Exception ex) {
                 return BadRequest(new { mensaje = $"Error al obtener las categorias: {ex.Message}" });
             }
@@ -60,17 +76,43 @@ namespace inaAPI.Controllers
 
         [HttpPut]
         // GET: CategoriaController/Edit/5
-        public async Task<ActionResult> Edit([FromBody] CategoriaUpdateDTO createDTO)
-        {
-            return View();
+        public async Task<ActionResult> Edit([FromBody] CategoriaUpdateDTO updateDTO) {
+
+            try {
+                var categoria = await _categoriaService.ActualizarAsync(updateDTO);
+                return Ok(categoria);
+
+            } catch (NotFoundExceptionD ex) {
+                return NotFound(ex.Message);
+
+            } catch (DuplicateNameException ex) {
+                return BadRequest(ex.Message);
+
+            } catch (Exception ex) {
+                return BadRequest(new { mensaje = $"Error al obtener las categorias: {ex.Message}" });
+            }
+           
         }//end METHOD
 
 
         [HttpDelete("{id}")]
         // GET: CategoriaController/Delete/5
-        public async Task<ActionResult> Delete(int id)
-        {
-            return View();
+        public async Task<ActionResult> Delete(int id) { 
+            
+            try {
+                var categoryDelete = await _categoriaService.EliminarAsync(id);
+                return Ok(categoryDelete);
+
+            } catch (NotFoundExceptionD ex) {
+                return NotFound(ex.Message);
+
+            } catch (InvalidIdException ex) {
+                return BadRequest(ex.Message);
+
+            } catch (Exception ex) {
+                return BadRequest(new { mensaje = $"Error al obtener la categoria: {ex.Message}" });
+            }
+
         }//end METHOD
 
 

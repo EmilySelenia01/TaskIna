@@ -14,12 +14,13 @@ namespace inaApp.Repository
 
         public CategoriaRepository(ApplicationDbContext context) {
             _context = context;
-        }
+
+        }//end METHOD
 
         public async Task<Categoria> ObtenerPorIdAsync(int id) {
             
             try {
-                return await _context.Categorias.AsNoTracking().Where(c => c.IdCategoria == id).SingleOrDefaultAsync();
+                return await _context.Categorias.AsNoTracking().Where(c => c.IdCategoria == id && c.Estado == true).SingleOrDefaultAsync();
 
             } catch (Exception ex) {
                 throw new Exception($"Error al crear la categoría: {ex.Message}");
@@ -31,7 +32,7 @@ namespace inaApp.Repository
             
             try {
 
-                return await _context.Categorias.AsNoTracking().ToListAsync();
+                return await _context.Categorias.AsNoTracking().Where(c => c.Estado == true).ToListAsync();
 
             } catch (Exception ex) {
                 throw new Exception($"Error al crear la categoría: {ex.Message}");
@@ -39,8 +40,8 @@ namespace inaApp.Repository
 
         }//end METHOD
 
-        public async Task<Categoria> CrearAsync(Categoria entity)
-        {
+        public async Task<Categoria> CrearAsync(Categoria entity) {
+            
             try {
 
                 _context.Categorias.AddAsync(entity);
@@ -54,14 +55,37 @@ namespace inaApp.Repository
 
         }//end METHOD 
 
-        public Task<Categoria> ActualizarAsync(Categoria entity)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task<bool> EliminarAsync(int id)
-        {
-            throw new NotImplementedException();
+        public async Task<Categoria> ActualizarAsync(Categoria entity) {
+            
+            try {
+                _context.Categorias.Update(entity);
+                await _context.SaveChangesAsync();
+                return entity;
+
+            } catch (Exception ex) {
+                throw new Exception($"Error al actualizar la categoría: {ex.Message}");
+            }
+
+        }//end METHOD
+
+
+        public async Task<bool> EliminarAsync(int id) {
+            
+            try {
+                var categoria = await ObtenerPorIdAsync(id);
+                if (categoria == null)
+                    throw new Exception("Categoría no encontrada");
+                
+                categoria.Estado = false;//delete logic by change the state
+                _context.Categorias.Update(categoria);
+                await _context.SaveChangesAsync();
+                return true;
+
+            } catch (Exception ex) {
+                throw new Exception($"Error al eliminar la categoría: {ex.Message}");
+            }
+
         }//end METHOD
 
  

@@ -76,7 +76,7 @@ namespace inaApp.Service
 
             var productos = await _productoRepository.ObtenerTodosAsync();
             if (productos.Any(p => p.Nombre.ToLower() == entity.Nombre.ToLower()))
-                throw new DuplicateProductNameException("El nombre del producto ya existe.");
+                throw new DuplicateNameException("El nombre del producto ya existe.");
 
             var categoria = await _categoriaRepository.ObtenerPorIdAsync(entity.IdCategoria);
             if (categoria == null)
@@ -100,6 +100,10 @@ namespace inaApp.Service
 
         public async Task<Responsee<ProductoResponseDTO>> ActualizarAsync(ProductoUpdateDTO entity) {
 
+            var existProducto = await _productoRepository.ObtenerPorIdAsync(entity.Id);
+            if (existProducto is null)
+                throw new NotFoundExceptionD($"El producto con id {entity.Id} no existe.");
+
             if (entity.Precio <= 0)
                 throw new InvalidPriceException("El precio debe ser mayor a cero.");
 
@@ -108,7 +112,7 @@ namespace inaApp.Service
 
             var existName = await _productoRepository.ObtenerTodosAsync();
             if (existName.Any(p => p.Nombre.ToLower() == entity.Nombre.ToLower() && p.Id != entity.Id))
-                throw new DuplicateProductNameException($"El nombre {entity.Nombre} ya existe.");
+                throw new DuplicateNameException($"El nombre {entity.Nombre} ya existe.");
 
             var categoria = await _categoriaRepository.ObtenerPorIdAsync(entity.IdCategoria);
             if (categoria == null)
@@ -127,6 +131,10 @@ namespace inaApp.Service
 
 
         public async Task<Responsee<bool>> EliminarAsync(int id) {
+            
+            var producto = await _productoRepository.ObtenerPorIdAsync(id);
+            if (producto is null)
+                throw new NotFoundExceptionD($"El producto con id {id} no existe.");
 
             var result = await _productoRepository.EliminarAsync(id);
 

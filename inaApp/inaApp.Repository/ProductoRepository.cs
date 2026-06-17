@@ -50,9 +50,11 @@ namespace inaApp.Repository
         public async Task<Producto> CrearAsync(Producto entity) { 
            
             try { 
-                await _context.Productos.AddAsync(entity);//aqui no es await porque es propio del contexto   
+                var resultado = await _context.Productos.AddAsync(entity);//aqui no es await porque es propio del contexto   
                 await _context.SaveChangesAsync();//await esperamos que se guarde por eso ponermos await 
-                return entity;
+
+                var productoCreado = await _context.Productos.Include(p => p.Categoria).FirstOrDefaultAsync(p => p.Id == resultado.Entity.Id);
+                return productoCreado;
  
             } catch (Exception ex) {
                
@@ -67,7 +69,8 @@ namespace inaApp.Repository
             try {
                 _context.Productos.Update(entity);
                 await _context.SaveChangesAsync();
-                return entity;
+                var productoActualizado = await _context.Productos.Include(p => p.Categoria).FirstOrDefaultAsync(p => p.Id == entity.Id);
+                return productoActualizado;
 
             } catch (Exception ex) {
                 throw new Exception("Error al actualizar el producto->", ex);
@@ -80,7 +83,6 @@ namespace inaApp.Repository
             
             try {
                 var producto = await ObtenerPorIdAsync(id);
-
                 if (producto == null)
                     return false;
 
